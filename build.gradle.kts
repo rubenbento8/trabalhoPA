@@ -11,7 +11,10 @@ repositories {
 }
 
 dependencies {
-    testImplementation(kotlin("test"))
+    implementation(kotlin("stdlib-jdk8"))
+    implementation("junit:junit:4.13.1")
+    testImplementation(kotlin("test-junit"))
+    testImplementation("junit:junit:4.13.2")
 }
 
 tasks.test {

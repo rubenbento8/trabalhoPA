@@ -92,6 +92,26 @@ class JsonNull : JsonValue {
     }
 }
 
+class GetNumerosVisitor : JsonVisitor {
+    private val numbers = mutableListOf<Int>()
+    override fun visit(jsonObject: JsonObject) {
+        jsonObject.properties.forEach{
+            if (it.key == "numero") {
+                val value = it.value
+                if (value is JsonInt) {
+                    numbers.add(value.value)
+                }
+            }
+        }
+    }
+
+    override fun getNumeros(): List<Int> {
+        return numbers
+    }
+}
+
+
+
 interface JsonVisitor {
     fun visit(jsonObject: JsonObject){}
     fun endVisit(jsonObject: JsonObject){}
@@ -102,4 +122,8 @@ interface JsonVisitor {
     fun visit(jsonString: JsonString){}
     fun visit(jsonBoolean: JsonBoolean){}
     fun visit(jsonNull: JsonNull){}
+    fun getNumeros(): List<Int> {
+        return emptyList()
+    }
 }
+
