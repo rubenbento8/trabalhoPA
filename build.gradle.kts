@@ -11,10 +11,16 @@ repositories {
 }
 
 dependencies {
+<<<<<<< Updated upstream
     implementation(kotlin("stdlib-jdk8"))
     implementation("junit:junit:4.13.1")
     testImplementation(kotlin("test-junit"))
     testImplementation("junit:junit:4.13.2")
+=======
+    testImplementation(kotlin("test"))
+    testImplementation("org.jetbrains.kotlin:kotlin-test:1.8.20-RC")
+    implementation("org.jetbrains.kotlin:kotlin-reflect:1.8.20-RC")
+>>>>>>> Stashed changes
 }
 
 tasks.test {

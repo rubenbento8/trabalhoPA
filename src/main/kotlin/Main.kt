@@ -1,3 +1,7 @@
+import sun.jvm.hotspot.oops.CellTypeState.value
+import kotlin.reflect.*
+import kotlin.reflect.full.*
+
 interface JsonValue {
     fun toJsonString(): String
     fun accept(jsonVisitor: JsonVisitor)
@@ -136,6 +140,7 @@ interface JsonVisitor {
     fun visit(jsonString: JsonString){}
     fun visit(jsonBoolean: JsonBoolean){}
     fun visit(jsonNull: JsonNull){}
+<<<<<<< Updated upstream
     fun getNumeros(): List<Int> {
         return emptyList()
     }
@@ -144,3 +149,117 @@ interface JsonVisitor {
     }
 }
 
+=======
+}
+
+@Target(AnnotationTarget.PROPERTY)
+annotation class PropertyName(val value: String)
+
+@Target(AnnotationTarget.PROPERTY)
+annotation class Ignore //TODO
+@Target(AnnotationTarget.PROPERTY)
+annotation class UseAsString //TODO
+
+private fun <V> KProperty<V>.getName(): String {
+    if(this.hasAnnotation<PropertyName>()) {
+        return this.findAnnotation<PropertyName>()!!.value
+    }
+
+    return this.name
+}
+
+fun toJson(inputR: Any): JsonValue{
+    when (inputR) {
+        is Int -> {
+           return JsonInt(inputR)
+        }
+        is Double -> {
+            return JsonDouble(inputR)
+        }
+        is String -> {
+            return JsonString(inputR)
+        }
+        is Char -> {
+            return JsonString(inputR as String)
+        }
+        is Boolean -> {
+            return JsonBoolean(inputR)
+        }
+        is Map<*,*> -> {
+            val map = mutableMapOf<String, JsonValue>()
+            inputR.forEach { (key, value) ->
+                map[key as String] = toJson(value!!)
+            }
+            return JsonObject(map)
+        }
+        is Collection<*> -> {
+            val list = mutableListOf<JsonValue>()
+            inputR.forEach{it ->
+                list.add(toJson(it!!))
+            }
+            return JsonArray(list)
+        }
+        else -> {
+            val ifIsEnum = inputR as KClass<*>
+            if (ifIsEnum.isEnum) {
+                val list = mutableListOf<JsonValue>()
+                inputR.enumConstants.forEach{
+                    list.add(toJson(it!!))
+                }
+                return JsonArray(list)
+            }
+            else {
+                val clazz = inputR::class
+                val map = mutableMapOf<String, JsonValue>()
+
+                clazz.dataClassFields.forEach { prop ->
+                    when (getSQLTypeMap[prop.returnType].toString()) {
+                        "Int" -> {
+                            map[prop.getName()] = JsonInt(prop.call(value) as Int)
+                        }
+
+                        "String" -> {
+                            map[prop.getName()] = JsonString(prop.call(value) as String)
+                        }
+
+                        "Boolean" -> {
+                            map[prop.getName()] = JsonBoolean(prop.call(value) as Boolean)
+                        }
+
+                        "Double" -> {
+                            map[prop.getName()] = JsonInt(prop.call(value) as Int)
+                        }
+                    }
+                }
+
+                return JsonObject(map)
+            }
+        }
+    }
+}
+
+val KClass<*>.dataClassFields: List<KProperty<*>>
+    get() {
+        require(isData) { "instance must be data class" }
+        return this.primaryConstructor!!.parameters.map { p ->
+            declaredMemberProperties.find { it.name == p.name }!!
+        }
+}
+
+// saber se um KClassifier é um enumerado
+val KClassifier?.isEnum: Boolean
+    get() = this is KClass<*> && this.isSubclassOf(Enum::class)
+
+// obter uma lista de constantes de um tipo enumerado
+val <T : Any> KClass<T>.enumConstants: List<T> get() {
+    require(isEnum) { "instance must be enum" }
+    return java.enumConstants.toList()
+}
+
+val getSQLTypeMap = mapOf<KType, String>(
+    String::class.createType() to "String",
+    Int::class.createType() to "Int",
+    Double::class.createType() to "Double",
+    Boolean::class.createType() to "Boolean",
+)
+>>>>>>> Stashed changes
