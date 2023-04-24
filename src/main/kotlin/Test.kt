@@ -145,8 +145,8 @@ class getObjectsWithNameAndNumberVisitorTest{
         val result = visitor.getObjectsWithNameAndNumberVisitor()
 
         assertEquals(2, result.size)
-        assertTrue(result.contains("""{"numero":123,"nome":"John Doe"}"""))
-        assertTrue(result.contains("""{"numero":456,"name":"Jane Smith"}"""))
+        assertTrue(result.contains("{\"numero\": 123,\"nome\": \"John Doe\"}"))
+        assertTrue(result.contains("{\"numero\": 456,\"nome\": \"Jane Smith\"}"))
     }
 
 }
