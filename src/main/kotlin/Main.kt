@@ -108,6 +108,20 @@ class GetNumerosVisitor : JsonVisitor {
     override fun getNumeros(): List<Int> {
         return numbers
     }
+
+}
+
+class GetObjectsWithNameAndNumberVisitor : JsonVisitor {
+    private val objects = mutableListOf<String>()
+    override fun visit(jsonObject: JsonObject) {
+        if (jsonObject.properties.containsKey("numero") && jsonObject.properties.containsKey("nome")){
+            objects.add(jsonObject.toJsonString())
+        }
+    }
+
+    override fun getObjectsWithNameAndNumberVisitor(): List<String> {
+        return objects
+    }
 }
 
 
@@ -123,6 +137,9 @@ interface JsonVisitor {
     fun visit(jsonBoolean: JsonBoolean){}
     fun visit(jsonNull: JsonNull){}
     fun getNumeros(): List<Int> {
+        return emptyList()
+    }
+    fun getObjectsWithNameAndNumberVisitor(): List<String>{
         return emptyList()
     }
 }

@@ -114,7 +114,42 @@ class GetNumerosVisitorTest {
         assertEquals(listOf(101101, 101102, 26503), visitor.getNumeros())
     }
 }
+class getObjectsWithNameAndNumberVisitorTest{
+    @Test
+    fun testGetObjectsWithNameAndNumberVisitor() {
+        val json = JsonObject(mapOf(
+            "a" to JsonInt(1),
+            "b" to JsonString("hello"),
+            "c" to JsonObject(mapOf(
+                "numero" to JsonInt(123),
+                "nome" to JsonString("John Doe")
+            )),
+            "d" to JsonObject(mapOf(
+                "x" to JsonDouble(3.14),
+                "y" to JsonBoolean(true)
+            )),
+            "e" to JsonArray(listOf(
+                JsonObject(mapOf(
+                    "numero" to JsonInt(456),
+                    "nome" to JsonString("Jane Smith")
+                )),
+                JsonObject(mapOf(
+                    "name" to JsonString("Bob Johnson"),
+                    "numero" to JsonInt(789)
+                ))
+            ))
+        ))
 
+        val visitor = GetObjectsWithNameAndNumberVisitor()
+        json.accept(visitor)
+        val result = visitor.getObjectsWithNameAndNumberVisitor()
+
+        assertEquals(2, result.size)
+        assertTrue(result.contains("""{"numero":123,"nome":"John Doe"}"""))
+        assertTrue(result.contains("""{"numero":456,"name":"Jane Smith"}"""))
+    }
+
+}
 class JsonObjectTest {
     @Test
     fun `toJsonString should return valid JSON string`() {
