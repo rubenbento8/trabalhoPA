@@ -356,7 +356,6 @@ class JsonBooleanTest {
             }
 
         }
-
         // Act
         jsonBoolean.accept(mockJsonVisitor)
 
@@ -364,17 +363,29 @@ class JsonBooleanTest {
         assertTrue(mockJsonVisitor.visited)
     }
 }
+fun main(){
+    val student1 = Student(12345, "Ruben Bento", false)
+    val student2 = Student(67890, "Gonçalo Pereira", false)
+    val list = listOf<Student>(student1, student2)
+    val exam = Exam("Teste", 6.0, null, list)
+
+    val jsonObject = toJson(exam)
+    println(jsonObject.toJsonString())
+}
 
 
 data class Exam(
     val uc: String,
-    val ects: Number,
-    val dataExame: Date? = null,
+    val ects: Double,
+    @UseAsString
+    val dataExame: Int? = null,
     val incritos: List<Student>
 )
 
 data class Student(
     val numero: Int,
+    @PropertyName("nome-aluno")
     val nome: String,
-    val internacional: Boolean
+    @Ignore
+    val internacional: Boolean,
 )

@@ -1,4 +1,3 @@
-import sun.jvm.hotspot.oops.CellTypeState.value
 import kotlin.reflect.*
 import kotlin.reflect.full.*
 
@@ -161,74 +160,92 @@ private fun <V> KProperty<V>.getName(): String {
     return this.name
 }
 
-fun toJson(inputR: Any): JsonValue{
-    when (inputR) {
-        is Int -> {
-            return JsonInt(inputR)
-        }
-        is Double -> {
-            return JsonDouble(inputR)
-        }
-        is String -> {
-            return JsonString(inputR)
-        }
-        is Char -> {
-            return JsonString(inputR as String)
-        }
-        is Boolean -> {
-            return JsonBoolean(inputR)
-        }
-        is Map<*,*> -> {
-            val map = mutableMapOf<String, JsonValue>()
-            inputR.forEach { (key, value) ->
-                map[key as String] = toJson(value!!)
+fun toJson(inputR: Any?): JsonValue{
+    if(inputR != null) {
+        when (inputR) {
+            is Int -> {
+                return JsonInt(inputR)
             }
-            return JsonObject(map)
-        }
-        is Collection<*> -> {
-            val list = mutableListOf<JsonValue>()
-            inputR.forEach{it ->
-                list.add(toJson(it!!))
+
+            is Double -> {
+                return JsonDouble(inputR)
             }
-            return JsonArray(list)
-        }
-        else -> {
-            val ifIsEnum = inputR as KClass<*>
+
+            is String -> {
+                return JsonString(inputR)
+            }
+
+            is Char -> {
+                return JsonString(inputR as String)
+            }
+
+            is Boolean -> {
+                return JsonBoolean(inputR)
+            }
+
+            is Map<*, *> -> {
+                val map = mutableMapOf<String, JsonValue>()
+                inputR.forEach { (key, value) ->
+                    map[key as String] = toJson(value!!)
+                }
+                return JsonObject(map)
+            }
+
+            is Collection<*> -> {
+                val list = mutableListOf<JsonValue>()
+                inputR.forEach { it ->
+                    list.add(toJson(it!!))
+                }
+                return JsonArray(list)
+            }
+
+            else -> {
+                /*
+                val ifIsEnum: KClass<*> = inputR::class
             if (ifIsEnum.isEnum) {
                 val list = mutableListOf<JsonValue>()
-                inputR.enumConstants.forEach{
+                ifIsEnum.enumConstants.forEach{
                     list.add(toJson(it!!))
                 }
                 return JsonArray(list)
             }
             else {
+*/
                 val clazz = inputR::class
                 val map = mutableMapOf<String, JsonValue>()
 
                 clazz.dataClassFields.forEach { prop ->
-                    if(!prop.hasAnnotation<Ignore>()){
+                    if (!prop.hasAnnotation<Ignore>()) {
                         when (prop.getType()) {
                             "Int" -> {
-                                map[prop.getName()] = JsonInt(prop.call(value) as Int)
+                                map[prop.getName()] = toJson(prop.call(inputR) as Int)
                             }
 
                             "String" -> {
-                                map[prop.getName()] = JsonString(prop.call(value) as String)
+                                map[prop.getName()] = toJson(prop.call(inputR).toString())
                             }
 
                             "Boolean" -> {
-                                map[prop.getName()] = JsonBoolean(prop.call(value) as Boolean)
+                                map[prop.getName()] = toJson(prop.call(inputR) as Boolean)
                             }
 
                             "Double" -> {
-                                map[prop.getName()] = JsonInt(prop.call(value) as Int)
+                                map[prop.getName()] = toJson(prop.call(inputR) as Double)
+                            }
+
+                            else -> {
+                                map[prop.getName()] = toJson(prop.call(inputR))
                             }
                         }
                     }
                 }
                 return JsonObject(map)
+                }
             }
         }
+    //}
+    else{
+        return JsonNull()
     }
 }
 
@@ -261,6 +278,8 @@ private fun <V> KProperty<V>.getType(): String {
     if(this.hasAnnotation<UseAsString>()){
         return "String"
     }
-
-    return getTypeMap[this.returnType]!!
+    if(getTypeMap.containsKey(this.returnType)) {
+        return getTypeMap[this.returnType]!!
+    }
+    return "else"
 }
