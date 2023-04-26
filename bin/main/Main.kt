@@ -19,7 +19,7 @@ class JsonObject(val properties: Map<String, JsonValue>) : JsonValue {
 
     override fun accept(jsonVisitor: JsonVisitor) {
         jsonVisitor.visit(this)
-        properties.forEach {
+        properties.forEach{
             it.value.accept(jsonVisitor)
         }
         jsonVisitor.endVisit(this)
@@ -37,7 +37,7 @@ class JsonArray(val elements: List<JsonValue>) : JsonValue {
 
     override fun accept(jsonVisitor: JsonVisitor) {
         jsonVisitor.visit(this)
-        elements.forEach {
+        elements.forEach{
             it.accept(jsonVisitor)
         }
         jsonVisitor.endVisit(this)
@@ -98,7 +98,7 @@ class JsonNull : JsonValue {
 class GetNumerosVisitor : JsonVisitor {
     private val numbers = mutableListOf<Int>()
     override fun visit(jsonObject: JsonObject) {
-        jsonObject.properties.forEach {
+        jsonObject.properties.forEach{
             if (it.key == "numero") {
                 val value = it.value
                 if (value is JsonInt) {
@@ -117,7 +117,7 @@ class GetNumerosVisitor : JsonVisitor {
 class GetObjectsWithNameAndNumberVisitor : JsonVisitor {
     private val objects = mutableListOf<String>()
     override fun visit(jsonObject: JsonObject) {
-        if (jsonObject.properties.containsKey("numero") && jsonObject.properties.containsKey("nome")) {
+        if (jsonObject.properties.containsKey("numero") && jsonObject.properties.containsKey("nome")){
             objects.add(jsonObject.toJsonString())
         }
     }
@@ -127,94 +127,41 @@ class GetObjectsWithNameAndNumberVisitor : JsonVisitor {
     }
 }
 
-
-class VerifyStructureVisitor : JsonVisitor {
-    private var isValid = true
-    override fun visit(jsonObject: JsonObject) {
-        if (jsonObject.properties.containsKey("numero")) {
-            val numeroValue = jsonObject.properties["numero"]
-            if (numeroValue !is JsonInt) {
-                isValid = false
-            }
-        }
-    }
-
-    override fun isValidStructure(): Boolean {
-        return isValid
-    }
-}
-
-class VerifyInscritosVisitor : JsonVisitor {
-    private var hasError = false
-    override fun visit(jsonObject: JsonObject) {
-        if (jsonObject.properties.containsKey("Inscritos")) {
-            val inscritosValue = jsonObject.properties["Inscritos"]
-            if (inscritosValue is JsonArray) {
-                val inscritos = inscritosValue.elements
-                if (inscritos.isNotEmpty()) {
-                    val expectedStructure = inscritos[0]
-                    for (element in inscritos) {
-                        if (element !is JsonObject || expectedStructure !is JsonObject || element.properties.size != expectedStructure.properties.size) {
-                            hasError = true
-                            break
-                        }
-                    }
-                }
-            }
-        }
-    }
-
-    override fun verifyInscritosVisitor(): Boolean {
-        return hasError
-    }
-}
-
 interface JsonVisitor {
-    fun visit(jsonObject: JsonObject) {}
-    fun endVisit(jsonObject: JsonObject) {}
-    fun visit(jsonArray: JsonArray) {}
-    fun endVisit(jsonArray: JsonArray) {}
-    fun visit(jsonInt: JsonInt) {}
-    fun visit(jsonDouble: JsonDouble) {}
-    fun visit(jsonString: JsonString) {}
-    fun visit(jsonBoolean: JsonBoolean) {}
-    fun visit(jsonNull: JsonNull) {}
+    fun visit(jsonObject: JsonObject){}
+    fun endVisit(jsonObject: JsonObject){}
+    fun visit(jsonArray: JsonArray){}
+    fun endVisit(jsonArray: JsonArray){}
+    fun visit(jsonInt: JsonInt){}
+    fun visit(jsonDouble: JsonDouble){}
+    fun visit(jsonString: JsonString){}
+    fun visit(jsonBoolean: JsonBoolean){}
+    fun visit(jsonNull: JsonNull){}
     fun getNumeros(): List<Int> {
         return emptyList()
     }
-
-    fun getObjectsWithNameAndNumberVisitor(): List<String> {
+    fun getObjectsWithNameAndNumberVisitor(): List<String>{
         return emptyList()
-    }
-
-    fun isValidStructure(): Boolean {
-        return true
-    }
-
-    fun verifyInscritosVisitor(): Boolean {
-        return true
     }
 }
 
 @Target(AnnotationTarget.PROPERTY)
 annotation class PropertyName(val value: String)
-
 @Target(AnnotationTarget.PROPERTY)
 annotation class Ignore
-
 @Target(AnnotationTarget.PROPERTY)
 annotation class UseAsString
 
 private fun <V> KProperty<V>.getName(): String {
-    if (this.hasAnnotation<PropertyName>()) {
+    if(this.hasAnnotation<PropertyName>()) {
         return this.findAnnotation<PropertyName>()!!.value
     }
 
     return this.name
 }
 
-fun toJson(inputR: Any?): JsonValue {
-    if (inputR != null) {
+fun toJson(inputR: Any?): JsonValue{
+    if(inputR != null) {
         when (inputR) {
             is Int -> {
                 return JsonInt(inputR)
@@ -263,7 +210,7 @@ fun toJson(inputR: Any?): JsonValue {
                 return JsonArray(list)
             }
             else {
-                */
+*/
                 val clazz = inputR::class
                 val map = mutableMapOf<String, JsonValue>()
 
@@ -293,11 +240,11 @@ fun toJson(inputR: Any?): JsonValue {
                     }
                 }
                 return JsonObject(map)
+                }
             }
         }
-    }
     //}
-    else {
+    else{
         return JsonNull()
     }
 }
@@ -315,11 +262,10 @@ private val KClassifier?.isEnum: Boolean
     get() = this is KClass<*> && this.isSubclassOf(Enum::class)
 
 // obter uma lista de constantes de um tipo enumerado
-private val <T : Any> KClass<T>.enumConstants: List<T>
-    get() {
-        require(isEnum) { "instance must be enum" }
-        return java.enumConstants.toList()
-    }
+private val <T : Any> KClass<T>.enumConstants: List<T> get() {
+    require(isEnum) { "instance must be enum" }
+    return java.enumConstants.toList()
+}
 
 private val getTypeMap = mapOf<KType, String>(
     String::class.createType() to "String",
@@ -329,10 +275,10 @@ private val getTypeMap = mapOf<KType, String>(
 )
 
 private fun <V> KProperty<V>.getType(): String {
-    if (this.hasAnnotation<UseAsString>()) {
+    if(this.hasAnnotation<UseAsString>()){
         return "String"
     }
-    if (getTypeMap.containsKey(this.returnType)) {
+    if(getTypeMap.containsKey(this.returnType)) {
         return getTypeMap[this.returnType]!!
     }
     return "else"
