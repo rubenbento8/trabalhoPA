@@ -1,4 +1,3 @@
-import jdk.jfr.internal.TypeLibrary.createType
 import kotlin.reflect.*
 import kotlin.reflect.full.*
 
@@ -10,11 +9,12 @@ interface JsonValue {
 class JsonObject(val properties: Map<String, JsonValue>) : JsonValue {
     override fun toJsonString(): String {
         return buildString {
-            append("{")
-            properties.entries.joinTo(this, ",") { (key, value) ->
+            append("{\n")
+            properties.entries.joinTo(this, ",\n") { (key, value) ->
                 "\"$key\": ${value.toJsonString()}"
             }
-            append("}")
+            //append("\n")
+            append("\n}\n")
         }
     }
 
@@ -30,8 +30,8 @@ class JsonObject(val properties: Map<String, JsonValue>) : JsonValue {
 class JsonArray(val elements: List<JsonValue>) : JsonValue {
     override fun toJsonString(): String {
         return buildString {
-            append("[")
-            elements.joinTo(this, ",") { it.toJsonString() }
+            append("[\n")
+            elements.joinTo(this, ",\n") { it.toJsonString() }
             append("]")
         }
     }
@@ -295,7 +295,7 @@ fun toJson(inputR: Any?): JsonValue {
     return JsonNull()
 }
 
-private val KClass<*>.dataClassFields: List<KProperty<*>>
+val KClass<*>.dataClassFields: List<KProperty<*>>
     get() {
         require(isData) { "instance must be data class" }
         return this.primaryConstructor!!.parameters.map { p ->

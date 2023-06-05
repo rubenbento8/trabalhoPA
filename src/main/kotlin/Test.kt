@@ -566,7 +566,7 @@ class JsonUtilsTest {
         val student1 = Student(12345, "Ruben Bento", false, StudentType.Master)
         val student2 = Student(67890, "Gonçalo Pereira", false, StudentType.Master)
         val list = listOf<Student>(student1, student2)
-        val exam = Exam("Teste", 6.0, null, list)
+        val exam = Exam("Teste", 6.0, null, list, list)
 
         // Act
         val jsonObject = toJson(exam)
@@ -584,9 +584,10 @@ class JsonUtilsTest {
 data class Exam(
     val uc: String,
     val ects: Double,
-    @UseAsString
+    //@UseAsString
     val dataExame: Int? = null,
     val inscritos: List<Student>,
+    val presentes: List<Student>,
 )
 
 enum class StudentType {
