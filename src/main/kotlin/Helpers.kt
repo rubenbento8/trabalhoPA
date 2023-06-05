@@ -1,8 +1,6 @@
 import java.awt.Component
 import java.awt.Dimension
 import java.awt.GridLayout
-import java.awt.Panel
-import java.awt.ScrollPane
 import java.awt.event.*
 import javax.swing.*
 import java.util.Stack
@@ -12,7 +10,7 @@ fun main() {
     val student1 = Student(12345, "Ruben Bento", false, StudentType.Master)
     val student2 = Student(67890, "Gonçalo Pereira", false, StudentType.Master)
     val list = listOf<Student>(student1, student2)
-    val exam = Exam("Teste", 6.0, null, list, list)
+    val exam = Exam("Teste", 6.0, null, list, student1)
 
     var editor = Editor(exam)
     editor.open()
@@ -67,11 +65,11 @@ class Editor(var objectz: Any) {
                         println("Array")
                     }
                     is JsonObject -> {
-                        add(testWidget(it.key,  it.value.toJsonString()))
+                        add(objectPrepWidget(it.key,  it.value as JsonObject))
                         println("Object")
                     }
                     else ->{
-                        add(testWidget(it.key,  it.value.toJsonString().removeSurrounding("\"")))
+                        add(propertyWidget(it.key,  it.value.toJsonString().removeSurrounding("\"")))
                     }
                 }
             }
@@ -81,9 +79,9 @@ class Editor(var objectz: Any) {
                 override fun mouseClicked(e: MouseEvent) {
                     if (SwingUtilities.isRightMouseButton(e)) {
                         val menu = JPopupMenu("Message")
-                        val add = JButton("add")
+                        val add = JButton("Add Property")
                         add.addActionListener {
-                            val text = JOptionPane.showInputDialog("text")
+                            val text = JOptionPane.showInputDialog("Property Name")
                             menu.isVisible = false
 
                             if(!jsonObjectMap.containsKey(text)) {
@@ -92,7 +90,7 @@ class Editor(var objectz: Any) {
                                 command.execute()
                             }
                         }
-                        val undo = JButton("undo")
+                        val undo = JButton("Undo")
                         undo.addActionListener {
                             if(commandList.isNotEmpty()) {
                                 val command = commandList.pop()
@@ -101,7 +99,7 @@ class Editor(var objectz: Any) {
                             menu.isVisible = false
                         }
 
-                        val del = JButton("delete all")
+                        val del = JButton("Delete all")
                         del.addActionListener {
                             components.forEach {
                                 remove(it)
@@ -153,6 +151,8 @@ class Editor(var objectz: Any) {
             alignmentX = Component.LEFT_ALIGNMENT
             alignmentY = Component.TOP_ALIGNMENT
 
+            var arrayF = array
+
             add(JLabel(" "))
             array.elements.forEach { it ->
                 add(arrayWidget(it.toJsonString().removeSurrounding("\"")))
@@ -163,13 +163,13 @@ class Editor(var objectz: Any) {
                 override fun mouseClicked(e: MouseEvent) {
                     if (SwingUtilities.isRightMouseButton(e)) {
                         val menu = JPopupMenu("Message")
-                        val add = JButton("add")
+                        val add = JButton("Add Array Element Element")
                         add.addActionListener {
-                            //val text = JOptionPane.showInputDialog("text")
-                            add(arrayWidget("null"))
+                            val command = AddArrayElement(this@apply, arrayF)
+                            commandList.add(command)
+                            command.execute()
+                            arrayF = command.newJsonArray
                             menu.isVisible = false
-                            revalidate()
-                            frame.repaint()
                         }
                         val del = JButton("delete all")
                         del.addActionListener {
@@ -188,7 +188,82 @@ class Editor(var objectz: Any) {
             })
         }
 
-    fun testWidget(key: String, value: String): JPanel =
+    fun objectPrepWidget(key: String, objectR: JsonObject): JPanel =
+        JPanel().apply {
+            layout = BoxLayout(this, BoxLayout.Y_AXIS)
+            alignmentX = Component.LEFT_ALIGNMENT
+            alignmentY = Component.TOP_ALIGNMENT
+
+            add(JLabel(" " + key))
+            add(objectPanel(objectR))
+        }
+
+    fun objectPanel(objectR: JsonObject): JPanel =
+        JPanel().apply {
+            layout = BoxLayout(this, BoxLayout.Y_AXIS)
+            alignmentX = Component.LEFT_ALIGNMENT
+            alignmentY = Component.TOP_ALIGNMENT
+
+            objectR.properties.forEach {
+                when(it.value){
+                    is JsonArray -> {
+                        add(arrayPrepWidget(it.key, it.value as JsonArray))
+                        println("Array")
+                    }
+                    is JsonObject -> {
+                        add(objectPrepWidget(it.key,  it.value as JsonObject))
+                        println("Object")
+                    }
+                    else ->{
+                        add(propertyWidget(it.key,  it.value.toJsonString().removeSurrounding("\"")))
+                    }
+                }
+            }
+
+            // menu
+            addMouseListener(object : MouseAdapter() {
+                override fun mouseClicked(e: MouseEvent) {
+                    if (SwingUtilities.isRightMouseButton(e)) {
+                        val menu = JPopupMenu("Message")
+                        val add = JButton("Add Property")
+                        add.addActionListener {
+                            val text = JOptionPane.showInputDialog("Property Name")
+                            menu.isVisible = false
+
+                            if(!jsonObjectMap.containsKey(text)) {
+                                val command = AddProperty(this@apply, text)
+                                commandList.add(command)
+                                command.execute()
+                            }
+                        }
+                        val undo = JButton("Undo")
+                        undo.addActionListener {
+                            if(commandList.isNotEmpty()) {
+                                val command = commandList.pop()
+                                command.undo()
+                            }
+                            menu.isVisible = false
+                        }
+
+                        val del = JButton("Delete all")
+                        del.addActionListener {
+                            components.forEach {
+                                remove(it)
+                            }
+                            menu.isVisible = false
+                            revalidate()
+                            frame.repaint()
+                        }
+                        menu.add(add)
+                        menu.add(undo)
+                        menu.add(del)
+                        menu.show(this@apply, 100, 100)
+                    }
+                }
+            })
+        }
+
+    fun propertyWidget(key: String, value: String): JPanel =
         JPanel().apply {
             layout = BoxLayout(this, BoxLayout.X_AXIS)
             alignmentX = Component.LEFT_ALIGNMENT
@@ -235,7 +310,7 @@ class Editor(var objectz: Any) {
 
     inner class AddProperty(var panel: JPanel, var key: String) : Command {
         override fun execute() {
-                panel.add(testWidget(key, "null"))
+                panel.add(propertyWidget(key, "null"))
                 jsonObjectMap[key] = toJson(null)
                 jsonObject = JsonObject(jsonObjectMap)
                 srcArea.text = jsonObject.toJsonString()
@@ -264,6 +339,27 @@ class Editor(var objectz: Any) {
             frame.repaint()
         }
     }
+
+    inner class AddArrayElement(var panel: JPanel, var array: JsonArray) : Command {
+        val oldJsonArray = array
+        var newJsonArray = array
+
+        override fun execute() {
+            var k = getKeyByValue(jsonObjectMap, array) as String
+            var newArray: MutableList<JsonValue> = array.elements.toMutableList()
+            newArray.add(JsonNull())
+            newJsonArray = JsonArray(newArray as List<JsonValue>)
+            jsonObjectMap[k] = newJsonArray
+            jsonObject = JsonObject(jsonObjectMap)
+            srcArea.text = jsonObject.toJsonString()
+            panel.add(arrayWidget("null"))
+            panel.revalidate()
+            frame.repaint()
+        }
+        override fun undo(){}
+    }
+
+
 }
 
 fun parseValue(input: String): Any? {
@@ -278,4 +374,8 @@ fun parseValue(input: String): Any? {
     } catch (e: Exception) {
         input // Return the input as string if any exception occurs during parsing
     }
+}
+
+fun <String, JsonValue> getKeyByValue(map: Map<String, JsonValue>, value: JsonValue): String? {
+    return map.entries.find { it.value == value }?.key
 }
