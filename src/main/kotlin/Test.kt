@@ -601,6 +601,78 @@ class JsonUtilsTest {
     }
 }
 
+class GetNumerosVisitor : JsonVisitor {
+    private val numbers = mutableListOf<Int>()
+    override fun visit(jsonObject: JsonObject) {
+        jsonObject.properties.forEach {
+            if (it.key == "numero") {
+                val value = it.value
+                if (value is JsonInt) {
+                    numbers.add(value.value)
+                }
+            }
+        }
+    }
+
+    override fun getNumeros(): List<Int> {
+        return numbers
+    }
+
+}
+
+class GetObjectsWithNameAndNumberVisitor : JsonVisitor {
+    private val objects = mutableListOf<String>()
+    override fun visit(jsonObject: JsonObject) {
+        if (jsonObject.properties.containsKey("numero") && jsonObject.properties.containsKey("nome")) {
+            objects.add(jsonObject.toJsonString())
+        }
+    }
+
+    override fun getObjectsWithNameAndNumberVisitor(): List<String> {
+        return objects
+    }
+}
+
+class VerifyStructureVisitor : JsonVisitor {
+    private var isValid = true
+    override fun visit(jsonObject: JsonObject) {
+        if (jsonObject.properties.containsKey("numero")) {
+            val numeroValue = jsonObject.properties["numero"]
+            if (numeroValue !is JsonInt) {
+                isValid = false
+            }
+        }
+    }
+
+    override fun isValidStructure(): Boolean {
+        return isValid
+    }
+}
+
+class VerifyInscritosVisitor : JsonVisitor {
+    private var hasError = false
+    override fun visit(jsonObject: JsonObject) {
+        if (jsonObject.properties.containsKey("Inscritos")) {
+            val inscritosValue = jsonObject.properties["Inscritos"]
+            if (inscritosValue is JsonArray) {
+                val inscritos = inscritosValue.elements
+                if (inscritos.isNotEmpty()) {
+                    val expectedStructure = inscritos[0]
+                    for (element in inscritos) {
+                        if (element !is JsonObject || expectedStructure !is JsonObject || element.properties.size != expectedStructure.properties.size) {
+                            hasError = true
+                            break
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    override fun verifyInscritosVisitor(): Boolean {
+        return hasError
+    }
+}
 
 
 
