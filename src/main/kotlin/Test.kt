@@ -44,7 +44,7 @@ class CourseTest {
 
         // Assert
         val expectedOutput =
-            "{\"uc\": \"PA\",\"ects\": 6.0,\"data-exame\": null,\"inscritos\": [{\"numero\": 101101,\"nome\": \"Dave Farley\",\"internacional\": true},{\"numero\": 101102,\"nome\": \"Martin Fowler\",\"internacional\": true},{\"numero\": 26503,\"nome\": \"André Santos\",\"internacional\": false}]}"
+            "{\n\"uc\": \"PA\",\n\"ects\": 6.0,\n\"data-exame\": null,\n\"inscritos\": [\n{\n\"numero\": 101101,\n\"nome\": \"Dave Farley\",\n\"internacional\": true\n}\n,\n{\n\"numero\": 101102,\n\"nome\": \"Martin Fowler\",\n\"internacional\": true\n}\n,\n{\n\"numero\": 26503,\n\"nome\": \"André Santos\",\n\"internacional\": false\n}\n]\n}\n"
         assertEquals(expectedOutput, jsonString)
     }
 }
@@ -135,8 +135,8 @@ class GetObjectsWithNameAndNumberVisitorTest {
         val result = visitor.getObjectsWithNameAndNumberVisitor()
 
         assertEquals(2, result.size)
-        assertTrue(result.contains("{\"numero\": 123,\"nome\": \"John Doe\"}"))
-        assertTrue(result.contains("{\"numero\": 456,\"nome\": \"Jane Smith\"}"))
+        assertTrue(result.contains("{\n\"numero\": 123,\n\"nome\": \"John Doe\"\n}\n"))
+        assertTrue(result.contains("{\n\"numero\": 456,\n\"nome\": \"Jane Smith\"\n}\n"))
     }
 }
 
@@ -262,7 +262,7 @@ class JsonObjectTest {
         val jsonString = jsonObject.toJsonString()
 
         // Assert
-        assertEquals("{\"name\": \"John\",\"age\": 30,\"isEmployed\": true}", jsonString)
+        assertEquals("{\n\"name\": \"John\",\n\"age\": 30,\n\"isEmployed\": true\n}\n", jsonString)
     }
 
     @Test
@@ -310,7 +310,7 @@ class JsonArrayTest {
         val jsonString = jsonArray.toJsonString()
 
         // Assert
-        assertEquals("[\"John\",30,true]", jsonString)
+        assertEquals("[\n\"John\",\n30,\ntrue]", jsonString)
     }
 
     @Test
@@ -574,11 +574,38 @@ class JsonUtilsTest {
         println(jsonString)
 
         // Assert
-        //val expectedJsonString = """{"uc": "Teste","ects": 6.0,"dataExame": "null","inscritos": [{"numero": 12345,"nome-aluno": "Ruben Bento"},{"numero": 67890,"nome-aluno": "Gonçalo Pereira"}]}"""
+        val expectedJsonString = """{
+            |"uc": "Teste",
+            |"ects": 6.0,
+            |"dataExame": null,
+            |"inscritos": [
+            |{
+            |"numero": 12345,
+            |"nome-aluno": "Ruben Bento"
+            |}
+            |,
+            |{
+            |"numero": 67890,
+            |"nome-aluno": "Gonçalo Pereira"
+            |}
+            |],
+            |"professor": {
+            |"numero": 12345,
+            |"nome-aluno": "Ruben Bento"
+            |}
+            |
+            |}
+            |""".trimMargin()
 
-        //assertEquals(expectedJsonString, jsonString)
+        assertEquals(expectedJsonString, jsonString)
     }
 }
+
+
+
+
+
+
 
 
 data class Exam(
@@ -600,5 +627,6 @@ data class Student(
     val nome: String,
     @Ignore
     val internacional: Boolean,
+    @Ignore
     val type: StudentType
 )
