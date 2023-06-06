@@ -8,11 +8,11 @@ Cada implementação de JsonValue possui o método toJsonString(), que retorna u
 Além disso, a interface JsonValue possui o método accept(), que será abordado no documento visitors.
 ### Criação de Estruturas JSON Usando a Classe JsonValue
 
-Para criar uma estrutura JSON, você precisa criar instâncias das classes JsonObject, JsonArray, JsonInt, JsonString, JsonBoolean e JsonNull, conforme necessário.
-Utilize os construtores dessas classes para fornecer os valores correspondentes aos elementos JSON.
+Para criar uma estrutura JSON, é necessário criar instâncias das classes JsonObject, JsonArray, JsonInt, JsonString, JsonBoolean e JsonNull.
+Deve-se utilizar os construtores dessas classes para fornecer os valores correspondentes aos elementos JSON.
 Para aninhar valores JSON, utilize as classes JsonObject e JsonArray.
 
-Por exemplo, para criar o seguinte JSON: {"nome": "John", "idade": 30}, você pode realizar o seguinte código:
+Por exemplo, para criar o seguinte JSON: {"nome": "John", "idade": 30}, devemos usar o código seguinte:
 ````kotlin
 val jsonObject = JsonObject(
     mapOf(
@@ -22,8 +22,8 @@ val jsonObject = JsonObject(
 
 ### Conversão de uma Estrutura JSON em uma String JSON
 
-Utilize o método toJsonString() de uma instância JsonValue para obter a representação em forma de string JSON do valor.
-Por exemplo, para obter a representação em forma de string JSON do objeto jsonObject criado anteriormente, execute o seguinte código:
+O método toJsonString() de uma instância JsonValue serve para obter a representação em forma de string JSON do valor.
+Por exemplo, para obter a representação em forma de string JSON do objeto jsonObject criado anteriormente, deve-se usar o seguinte código:
 ````kotlin
 val jsonString = jsonObject.toJsonString()
 println(jsonString) //{"nome": "John", "idade": 30}
@@ -31,12 +31,12 @@ println(jsonString) //{"nome": "John", "idade": 30}
 
 ### Conversão de Objetos Kotlin em Estruturas JSON
 
-Utilize a função toJson() para converter objetos Kotlin em estruturas JSON.
-A função toJson() aceita qualquer objeto Kotlin e realiza a conversão com base em seus tipos de dados.
+A função toJson() serve para converter objetos Kotlin em estruturas JSON.
+A função toJson() aceita qualquer objeto Kotlin e realiza a conversão com base nos seus tipos de dados.
 Os tipos de dados suportados incluem Int, Double, String, Char, Boolean, Map, Collection e enumerações.
 Os campos de dados de um objeto Kotlin serão convertidos em propriedades JSON.
 
-Por exemplo, considere a seguinte classe Kotlin:
+Por exemplo, considerando a seguinte classe Kotlin:
 ````kotlin
 data class Person(
     val nome: String,
@@ -44,7 +44,7 @@ data class Person(
     val email: String
 )
 ````
-Para converter um objeto Person em uma estrutura JSON, siga estes passos:
+Para converter um objeto Person em uma estrutura JSON, seguimos os seguintes passos:
 
 ````kotlin
 val person = Person("John", 30, "john@example.com")
