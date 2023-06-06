@@ -9,11 +9,12 @@ interface JsonValue {
 class JsonObject(val properties: Map<String, JsonValue>) : JsonValue {
     override fun toJsonString(): String {
         return buildString {
-            append("{")
-            properties.entries.joinTo(this, ",") { (key, value) ->
+            append("{\n")
+            properties.entries.joinTo(this, ",\n") { (key, value) ->
                 "\"$key\": ${value.toJsonString()}"
             }
-            append("}")
+            //append("\n")
+            append("\n}\n")
         }
     }
 
@@ -29,8 +30,8 @@ class JsonObject(val properties: Map<String, JsonValue>) : JsonValue {
 class JsonArray(val elements: List<JsonValue>) : JsonValue {
     override fun toJsonString(): String {
         return buildString {
-            append("[")
-            elements.joinTo(this, ",") { it.toJsonString() }
+            append("[\n")
+            elements.joinTo(this, ",\n") { it.toJsonString() }
             append("]")
         }
     }
@@ -209,7 +210,6 @@ private fun <V> KProperty<V>.getName(): String {
     if (this.hasAnnotation<PropertyName>()) {
         return this.findAnnotation<PropertyName>()!!.value
     }
-
     return this.name
 }
 
@@ -253,56 +253,49 @@ fun toJson(inputR: Any?): JsonValue {
             }
 
             else -> {
-                /*
-                val ifIsEnum: KClass<*> = inputR::class
-            if (ifIsEnum.isEnum) {
-                val list = mutableListOf<JsonValue>()
-                ifIsEnum.enumConstants.forEach{
-                    list.add(toJson(it!!))
-                }
-                return JsonArray(list)
-            }
-            else {
-                */
-                val clazz = inputR::class
-                val map = mutableMapOf<String, JsonValue>()
+                val p = inputR::class
+                val ifIsEnum = p as KClass<*>
+                if (ifIsEnum.isEnum) {
+                    return JsonString(inputR.toString())
+                } else {
 
-                clazz.dataClassFields.forEach { prop ->
-                    if (!prop.hasAnnotation<Ignore>()) {
-                        when (prop.getType()) {
-                            "Int" -> {
-                                map[prop.getName()] = toJson(prop.call(inputR) as Int)
-                            }
+                    val clazz = inputR::class
+                    val map = mutableMapOf<String, JsonValue>()
 
-                            "String" -> {
-                                map[prop.getName()] = toJson(prop.call(inputR).toString())
-                            }
+                    clazz.dataClassFields.forEach { prop ->
+                        if (!prop.hasAnnotation<Ignore>()) {
+                            when (prop.getType()) {
+                                "Int" ->{
+                                    map[prop.getName()] = toJson(prop.call(inputR) as Int)
+                                }
 
-                            "Boolean" -> {
-                                map[prop.getName()] = toJson(prop.call(inputR) as Boolean)
-                            }
+                                "String" -> {
+                                    map[prop.getName()] = toJson(prop.call(inputR).toString())
+                                }
 
-                            "Double" -> {
-                                map[prop.getName()] = toJson(prop.call(inputR) as Double)
-                            }
+                                "Boolean" -> {
+                                    map[prop.getName()] = toJson(prop.call(inputR) as Boolean)
+                                }
 
-                            else -> {
-                                map[prop.getName()] = toJson(prop.call(inputR))
+                                "Double" -> {
+                                    map[prop.getName()] = toJson(prop.call(inputR) as Double)
+                                }
+
+                                else -> {
+                                    map[prop.getName()] = toJson(prop.call(inputR))
+                                }
                             }
                         }
                     }
+                    return JsonObject(map)
                 }
-                return JsonObject(map)
             }
         }
     }
-    //}
-    else {
-        return JsonNull()
-    }
+    return JsonNull()
 }
 
-private val KClass<*>.dataClassFields: List<KProperty<*>>
+val KClass<*>.dataClassFields: List<KProperty<*>>
     get() {
         require(isData) { "instance must be data class" }
         return this.primaryConstructor!!.parameters.map { p ->
@@ -310,16 +303,8 @@ private val KClass<*>.dataClassFields: List<KProperty<*>>
         }
     }
 
-// saber se um KClassifier é um enumerado
 private val KClassifier?.isEnum: Boolean
     get() = this is KClass<*> && this.isSubclassOf(Enum::class)
-
-// obter uma lista de constantes de um tipo enumerado
-private val <T : Any> KClass<T>.enumConstants: List<T>
-    get() {
-        require(isEnum) { "instance must be enum" }
-        return java.enumConstants.toList()
-    }
 
 private val getTypeMap = mapOf<KType, String>(
     String::class.createType() to "String",
