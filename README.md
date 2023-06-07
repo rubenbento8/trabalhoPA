@@ -19,6 +19,7 @@ A estrutura de arquivos do projeto é organizada da seguinte maneira:
           - Helpers.kt
           - Main.kt
           - Test.kt
+          - Help.kt
 - docs/
     - anotations.md
     - simple.md
@@ -28,7 +29,8 @@ A estrutura de arquivos do projeto é organizada da seguinte maneira:
 A pasta src contém o código-fonte principal do projeto. Os arquivos principais são:
 * Main.kt - Possui toda a parte funcional da biblioteca e é o cerne de todo o projeto
 * Helpers.kt - Possui toda a parte funcional da interface gráfica.
-* Test.kt . Possui todos os testes utilizados para certificar o funcionamento da biblioteca.
+* Test.kt - Possui todos os testes utilizados para certificar o funcionamento da biblioteca.
+* Help.kt - Possui funções de suporte aos helpers.kt e funções extra como os visitor do Main.kt
 
 A pasta tutorials contém os tutoriais relacionados à biblioteca JSON-Kotlin. Você pode encontrá-los nos arquivos TutorialSimples.md e TutorialCompleto.md.
 
