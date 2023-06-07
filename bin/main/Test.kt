@@ -7,28 +7,28 @@ class CourseTest {
     fun returnValidJsonStringTest() {
         // Arrange
         val course = JsonObject(
-            mapOf(
+            mutableMapOf(
                 "uc" to JsonString("PA"),
                 "ects" to JsonDouble(6.0),
                 "data-exame" to JsonNull(),
                 "inscritos" to JsonArray(
-                    listOf(
+                    mutableListOf(
                         JsonObject(
-                            mapOf(
+                            mutableMapOf(
                                 "numero" to JsonInt(101101),
                                 "nome" to JsonString("Dave Farley"),
                                 "internacional" to JsonBoolean(true)
                             )
                         ),
                         JsonObject(
-                            mapOf(
+                            mutableMapOf(
                                 "numero" to JsonInt(101102),
                                 "nome" to JsonString("Martin Fowler"),
                                 "internacional" to JsonBoolean(true)
                             )
                         ),
                         JsonObject(
-                            mapOf(
+                            mutableMapOf(
                                 "numero" to JsonInt(26503),
                                 "nome" to JsonString("André Santos"),
                                 "internacional" to JsonBoolean(false)
@@ -44,7 +44,7 @@ class CourseTest {
 
         // Assert
         val expectedOutput =
-            "{\"uc\": \"PA\",\"ects\": 6.0,\"data-exame\": null,\"inscritos\": [{\"numero\": 101101,\"nome\": \"Dave Farley\",\"internacional\": true},{\"numero\": 101102,\"nome\": \"Martin Fowler\",\"internacional\": true},{\"numero\": 26503,\"nome\": \"André Santos\",\"internacional\": false}]}"
+            "{\n\"uc\": \"PA\",\n\"ects\": 6.0,\n\"data-exame\": null,\n\"inscritos\": [\n{\n\"numero\": 101101,\n\"nome\": \"Dave Farley\",\n\"internacional\": true\n}\n,\n{\n\"numero\": 101102,\n\"nome\": \"Martin Fowler\",\n\"internacional\": true\n}\n,\n{\n\"numero\": 26503,\n\"nome\": \"André Santos\",\n\"internacional\": false\n}\n]\n}\n"
         assertEquals(expectedOutput, jsonString)
     }
 }
@@ -54,28 +54,28 @@ class GetNumerosVisitorTest {
     @Test
     fun testGetNumerosVisitor() {
         val course = JsonObject(
-            mapOf(
+            mutableMapOf(
                 "uc" to JsonString("PA"),
                 "ects" to JsonDouble(6.0),
                 "data-exame" to JsonNull(),
                 "inscritos" to JsonArray(
-                    listOf(
+                    mutableListOf(
                         JsonObject(
-                            mapOf(
+                            mutableMapOf(
                                 "numero" to JsonInt(101101),
                                 "nome" to JsonString("Dave Farley"),
                                 "internacional" to JsonBoolean(true)
                             )
                         ),
                         JsonObject(
-                            mapOf(
+                            mutableMapOf(
                                 "numero" to JsonInt(101102),
                                 "nome" to JsonString("Martin Fowler"),
                                 "internacional" to JsonBoolean(true)
                             )
                         ),
                         JsonObject(
-                            mapOf(
+                            mutableMapOf(
                                 "numero" to JsonInt(26503),
                                 "nome" to JsonString("André Santos"),
                                 "internacional" to JsonBoolean(false)
@@ -96,31 +96,31 @@ class GetObjectsWithNameAndNumberVisitorTest {
     @Test
     fun testGetObjectsWithNameAndNumberVisitor() {
         val json = JsonObject(
-            mapOf(
+            mutableMapOf(
                 "a" to JsonInt(1),
                 "b" to JsonString("hello"),
                 "c" to JsonObject(
-                    mapOf(
+                    mutableMapOf(
                         "numero" to JsonInt(123),
                         "nome" to JsonString("John Doe")
                     )
                 ),
                 "d" to JsonObject(
-                    mapOf(
+                    mutableMapOf(
                         "x" to JsonDouble(3.14),
                         "y" to JsonBoolean(true)
                     )
                 ),
                 "e" to JsonArray(
-                    listOf(
+                    mutableListOf(
                         JsonObject(
-                            mapOf(
+                            mutableMapOf(
                                 "numero" to JsonInt(456),
                                 "nome" to JsonString("Jane Smith")
                             )
                         ),
                         JsonObject(
-                            mapOf(
+                            mutableMapOf(
                                 "name" to JsonString("Bob Johnson"),
                                 "numero" to JsonInt(789)
                             )
@@ -135,8 +135,8 @@ class GetObjectsWithNameAndNumberVisitorTest {
         val result = visitor.getObjectsWithNameAndNumberVisitor()
 
         assertEquals(2, result.size)
-        assertTrue(result.contains("{\"numero\": 123,\"nome\": \"John Doe\"}"))
-        assertTrue(result.contains("{\"numero\": 456,\"nome\": \"Jane Smith\"}"))
+        assertTrue(result.contains("{\n\"numero\": 123,\n\"nome\": \"John Doe\"\n}\n"))
+        assertTrue(result.contains("{\n\"numero\": 456,\n\"nome\": \"Jane Smith\"\n}\n"))
     }
 }
 
@@ -144,31 +144,31 @@ class VerifyStructureVisitorTest {
     @Test
     fun testVerifyStructureVisitor() {
         val json = JsonObject(
-            mapOf(
+            mutableMapOf(
                 "a" to JsonInt(1),
                 "b" to JsonString("hello"),
                 "c" to JsonObject(
-                    mapOf(
+                    mutableMapOf(
                         "numero" to JsonString("123"),
                         "nome" to JsonString("John Doe")
                     )
                 ),
                 "d" to JsonObject(
-                    mapOf(
+                    mutableMapOf(
                         "x" to JsonDouble(3.14),
                         "y" to JsonBoolean(true)
                     )
                 ),
                 "e" to JsonArray(
-                    listOf(
+                    mutableListOf(
                         JsonObject(
-                            mapOf(
+                            mutableMapOf(
                                 "numero" to JsonInt(456),
                                 "nome" to JsonString("Jane Smith")
                             )
                         ),
                         JsonObject(
-                            mapOf(
+                            mutableMapOf(
                                 "name" to JsonString("Bob Johnson"),
                                 "numero" to JsonInt(789)
                             )
@@ -193,17 +193,17 @@ class VerifyInscritosVisitorTest {
     @Test
     fun testVisitWithValidStructure() {
         val json = JsonObject(
-            mapOf(
+            mutableMapOf(
                 "Inscritos" to JsonArray(
-                    listOf(
+                    mutableListOf(
                         JsonObject(
-                            mapOf(
+                            mutableMapOf(
                                 "nome" to JsonString("Alice"),
                                 "idade" to JsonInt(25)
                             )
                         ),
                         JsonObject(
-                            mapOf(
+                            mutableMapOf(
                                 "nome" to JsonString("Bob"),
                                 "idade" to JsonInt(30)
                             )
@@ -223,11 +223,11 @@ class VerifyInscritosVisitorTest {
     @Test
     fun testVisitWithInvalidStructure() {
         val json = JsonObject(
-            mapOf(
+            mutableMapOf(
                 "Inscritos" to JsonArray(
-                    listOf(
+                    mutableListOf(
                         JsonObject(
-                            mapOf(
+                            mutableMapOf(
                                 "nome" to JsonString("Alice"),
                                 "idade" to JsonInt(25)
                             )
@@ -251,7 +251,7 @@ class JsonObjectTest {
     @Test
     fun jsonObjectShouldReturnValidStringTest() {
         // Arrange
-        val properties = mapOf(
+        val properties = mutableMapOf(
             "name" to JsonString("John"),
             "age" to JsonInt(30),
             "isEmployed" to JsonBoolean(true)
@@ -262,13 +262,13 @@ class JsonObjectTest {
         val jsonString = jsonObject.toJsonString()
 
         // Assert
-        assertEquals("{\"name\": \"John\",\"age\": 30,\"isEmployed\": true}", jsonString)
+        assertEquals("{\n\"name\": \"John\",\n\"age\": 30,\n\"isEmployed\": true\n}\n", jsonString)
     }
 
     @Test
     fun acceptShouldCallVisitAndEndVisitFunctionsOfJsonVisitorTest() {
         // Arrange
-        val properties = mapOf(
+        val properties = mutableMapOf(
             "name" to JsonString("John"),
             "age" to JsonInt(30),
             "isEmployed" to JsonBoolean(true)
@@ -299,7 +299,7 @@ class JsonArrayTest {
     @Test
     fun toJsonStringShouldReturnValidJSONStringTest() {
         // Arrange
-        val elements = listOf(
+        val elements = mutableListOf(
             JsonString("John"),
             JsonInt(30),
             JsonBoolean(true)
@@ -310,13 +310,13 @@ class JsonArrayTest {
         val jsonString = jsonArray.toJsonString()
 
         // Assert
-        assertEquals("[\"John\",30,true]", jsonString)
+        assertEquals("[\n\"John\",\n30,\ntrue]", jsonString)
     }
 
     @Test
     fun acceptShouldCallVisitAndEndVisitFunctionsOfJsonVisitorTest() {
         // Arrange
-        val elements = listOf(
+        val elements = mutableListOf(
             JsonString("John"),
             JsonInt(30),
             JsonBoolean(true)
@@ -515,7 +515,7 @@ class JsonUtilsTest {
         val person = Person("John", 30, true)
         val json = toJson(person)
         val expectedJson = JsonObject(
-            mapOf(
+            mutableMapOf(
                 "name" to JsonString("John"),
                 "age" to JsonInt(30),
                 "isMarried" to JsonBoolean(true)
@@ -539,18 +539,18 @@ class JsonUtilsTest {
         )
         val nestedJson = toJson(data)
         val expectedNestedJson = JsonObject(
-            mapOf(
+            mutableMapOf(
                 "name" to JsonString("John"),
                 "age" to JsonInt(30),
                 "address" to JsonObject(
-                    mapOf(
+                    mutableMapOf(
                         "street" to JsonString("123 Main St"),
                         "city" to JsonString("Anytown"),
                         "state" to JsonString("CA")
                     )
                 ),
                 "phones" to JsonArray(
-                    listOf(
+                    mutableListOf(
                         JsonString("555-1234"),
                         JsonString("555-5678")
                     )
@@ -565,7 +565,7 @@ class JsonUtilsTest {
         // Arrange
         val student1 = Student(12345, "Ruben Bento", false, StudentType.Master)
         val student2 = Student(67890, "Gonçalo Pereira", false, StudentType.Master)
-        val list = listOf<Student>(student1, student2)
+        val list = listOf(student1, student2)
         val exam = Exam("Teste", 6.0, null, list, student1)
 
         // Act
@@ -574,9 +574,30 @@ class JsonUtilsTest {
         println(jsonString)
 
         // Assert
-        //val expectedJsonString = """{"uc": "Teste","ects": 6.0,"dataExame": "null","inscritos": [{"numero": 12345,"nome-aluno": "Ruben Bento"},{"numero": 67890,"nome-aluno": "Gonçalo Pereira"}]}"""
+        val expectedJsonString = """{
+            |"uc": "Teste",
+            |"ects": 6.0,
+            |"dataExame": null,
+            |"inscritos": [
+            |{
+            |"numero": 12345,
+            |"nome-aluno": "Ruben Bento"
+            |}
+            |,
+            |{
+            |"numero": 67890,
+            |"nome-aluno": "Gonçalo Pereira"
+            |}
+            |],
+            |"professor": {
+            |"numero": 12345,
+            |"nome-aluno": "Ruben Bento"
+            |}
+            |
+            |}
+            |""".trimMargin()
 
-        //assertEquals(expectedJsonString, jsonString)
+        assertEquals(expectedJsonString, jsonString)
     }
 }
 
@@ -672,5 +693,6 @@ data class Student(
     val nome: String,
     @Ignore
     val internacional: Boolean,
+    @Ignore
     val type: StudentType
 )

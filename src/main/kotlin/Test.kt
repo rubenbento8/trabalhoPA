@@ -7,28 +7,28 @@ class CourseTest {
     fun returnValidJsonStringTest() {
         // Arrange
         val course = JsonObject(
-            mapOf(
+            mutableMapOf(
                 "uc" to JsonString("PA"),
                 "ects" to JsonDouble(6.0),
                 "data-exame" to JsonNull(),
                 "inscritos" to JsonArray(
-                    listOf(
+                    mutableListOf(
                         JsonObject(
-                            mapOf(
+                            mutableMapOf(
                                 "numero" to JsonInt(101101),
                                 "nome" to JsonString("Dave Farley"),
                                 "internacional" to JsonBoolean(true)
                             )
                         ),
                         JsonObject(
-                            mapOf(
+                            mutableMapOf(
                                 "numero" to JsonInt(101102),
                                 "nome" to JsonString("Martin Fowler"),
                                 "internacional" to JsonBoolean(true)
                             )
                         ),
                         JsonObject(
-                            mapOf(
+                            mutableMapOf(
                                 "numero" to JsonInt(26503),
                                 "nome" to JsonString("André Santos"),
                                 "internacional" to JsonBoolean(false)
@@ -54,28 +54,28 @@ class GetNumerosVisitorTest {
     @Test
     fun testGetNumerosVisitor() {
         val course = JsonObject(
-            mapOf(
+            mutableMapOf(
                 "uc" to JsonString("PA"),
                 "ects" to JsonDouble(6.0),
                 "data-exame" to JsonNull(),
                 "inscritos" to JsonArray(
-                    listOf(
+                    mutableListOf(
                         JsonObject(
-                            mapOf(
+                            mutableMapOf(
                                 "numero" to JsonInt(101101),
                                 "nome" to JsonString("Dave Farley"),
                                 "internacional" to JsonBoolean(true)
                             )
                         ),
                         JsonObject(
-                            mapOf(
+                            mutableMapOf(
                                 "numero" to JsonInt(101102),
                                 "nome" to JsonString("Martin Fowler"),
                                 "internacional" to JsonBoolean(true)
                             )
                         ),
                         JsonObject(
-                            mapOf(
+                            mutableMapOf(
                                 "numero" to JsonInt(26503),
                                 "nome" to JsonString("André Santos"),
                                 "internacional" to JsonBoolean(false)
@@ -96,31 +96,31 @@ class GetObjectsWithNameAndNumberVisitorTest {
     @Test
     fun testGetObjectsWithNameAndNumberVisitor() {
         val json = JsonObject(
-            mapOf(
+            mutableMapOf(
                 "a" to JsonInt(1),
                 "b" to JsonString("hello"),
                 "c" to JsonObject(
-                    mapOf(
+                    mutableMapOf(
                         "numero" to JsonInt(123),
                         "nome" to JsonString("John Doe")
                     )
                 ),
                 "d" to JsonObject(
-                    mapOf(
+                    mutableMapOf(
                         "x" to JsonDouble(3.14),
                         "y" to JsonBoolean(true)
                     )
                 ),
                 "e" to JsonArray(
-                    listOf(
+                    mutableListOf(
                         JsonObject(
-                            mapOf(
+                            mutableMapOf(
                                 "numero" to JsonInt(456),
                                 "nome" to JsonString("Jane Smith")
                             )
                         ),
                         JsonObject(
-                            mapOf(
+                            mutableMapOf(
                                 "name" to JsonString("Bob Johnson"),
                                 "numero" to JsonInt(789)
                             )
@@ -144,31 +144,31 @@ class VerifyStructureVisitorTest {
     @Test
     fun testVerifyStructureVisitor() {
         val json = JsonObject(
-            mapOf(
+            mutableMapOf(
                 "a" to JsonInt(1),
                 "b" to JsonString("hello"),
                 "c" to JsonObject(
-                    mapOf(
+                    mutableMapOf(
                         "numero" to JsonString("123"),
                         "nome" to JsonString("John Doe")
                     )
                 ),
                 "d" to JsonObject(
-                    mapOf(
+                    mutableMapOf(
                         "x" to JsonDouble(3.14),
                         "y" to JsonBoolean(true)
                     )
                 ),
                 "e" to JsonArray(
-                    listOf(
+                    mutableListOf(
                         JsonObject(
-                            mapOf(
+                            mutableMapOf(
                                 "numero" to JsonInt(456),
                                 "nome" to JsonString("Jane Smith")
                             )
                         ),
                         JsonObject(
-                            mapOf(
+                            mutableMapOf(
                                 "name" to JsonString("Bob Johnson"),
                                 "numero" to JsonInt(789)
                             )
@@ -193,17 +193,17 @@ class VerifyInscritosVisitorTest {
     @Test
     fun testVisitWithValidStructure() {
         val json = JsonObject(
-            mapOf(
+            mutableMapOf(
                 "Inscritos" to JsonArray(
-                    listOf(
+                    mutableListOf(
                         JsonObject(
-                            mapOf(
+                            mutableMapOf(
                                 "nome" to JsonString("Alice"),
                                 "idade" to JsonInt(25)
                             )
                         ),
                         JsonObject(
-                            mapOf(
+                            mutableMapOf(
                                 "nome" to JsonString("Bob"),
                                 "idade" to JsonInt(30)
                             )
@@ -223,11 +223,11 @@ class VerifyInscritosVisitorTest {
     @Test
     fun testVisitWithInvalidStructure() {
         val json = JsonObject(
-            mapOf(
+            mutableMapOf(
                 "Inscritos" to JsonArray(
-                    listOf(
+                    mutableListOf(
                         JsonObject(
-                            mapOf(
+                            mutableMapOf(
                                 "nome" to JsonString("Alice"),
                                 "idade" to JsonInt(25)
                             )
@@ -251,7 +251,7 @@ class JsonObjectTest {
     @Test
     fun jsonObjectShouldReturnValidStringTest() {
         // Arrange
-        val properties = mapOf(
+        val properties = mutableMapOf(
             "name" to JsonString("John"),
             "age" to JsonInt(30),
             "isEmployed" to JsonBoolean(true)
@@ -268,7 +268,7 @@ class JsonObjectTest {
     @Test
     fun acceptShouldCallVisitAndEndVisitFunctionsOfJsonVisitorTest() {
         // Arrange
-        val properties = mapOf(
+        val properties = mutableMapOf(
             "name" to JsonString("John"),
             "age" to JsonInt(30),
             "isEmployed" to JsonBoolean(true)
@@ -299,7 +299,7 @@ class JsonArrayTest {
     @Test
     fun toJsonStringShouldReturnValidJSONStringTest() {
         // Arrange
-        val elements = listOf(
+        val elements = mutableListOf(
             JsonString("John"),
             JsonInt(30),
             JsonBoolean(true)
@@ -316,7 +316,7 @@ class JsonArrayTest {
     @Test
     fun acceptShouldCallVisitAndEndVisitFunctionsOfJsonVisitorTest() {
         // Arrange
-        val elements = listOf(
+        val elements = mutableListOf(
             JsonString("John"),
             JsonInt(30),
             JsonBoolean(true)
@@ -515,7 +515,7 @@ class JsonUtilsTest {
         val person = Person("John", 30, true)
         val json = toJson(person)
         val expectedJson = JsonObject(
-            mapOf(
+            mutableMapOf(
                 "name" to JsonString("John"),
                 "age" to JsonInt(30),
                 "isMarried" to JsonBoolean(true)
@@ -539,18 +539,18 @@ class JsonUtilsTest {
         )
         val nestedJson = toJson(data)
         val expectedNestedJson = JsonObject(
-            mapOf(
+            mutableMapOf(
                 "name" to JsonString("John"),
                 "age" to JsonInt(30),
                 "address" to JsonObject(
-                    mapOf(
+                    mutableMapOf(
                         "street" to JsonString("123 Main St"),
                         "city" to JsonString("Anytown"),
                         "state" to JsonString("CA")
                     )
                 ),
                 "phones" to JsonArray(
-                    listOf(
+                    mutableListOf(
                         JsonString("555-1234"),
                         JsonString("555-5678")
                     )
@@ -565,7 +565,7 @@ class JsonUtilsTest {
         // Arrange
         val student1 = Student(12345, "Ruben Bento", false, StudentType.Master)
         val student2 = Student(67890, "Gonçalo Pereira", false, StudentType.Master)
-        val list = listOf<Student>(student1, student2)
+        val list = listOf(student1, student2)
         val exam = Exam("Teste", 6.0, null, list, student1)
 
         // Act
@@ -673,12 +673,6 @@ class VerifyInscritosVisitor : JsonVisitor {
         return hasError
     }
 }
-
-
-
-
-
-
 
 data class Exam(
     val uc: String,

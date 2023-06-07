@@ -21,7 +21,7 @@ class Editor(objectz: Any) {
     private var commandList: Stack<Command> = Stack<Command>()
     private var jsonObject: JsonObject = toJson(objectz) as JsonObject
     private var jsonObjectMap: MutableMap<String, JsonValue> = jsonObject.properties
-    private var rootPanel: JScrollPane
+    private var scrollPanel: JScrollPane
     private var srcArea: JTextArea
     private var left: JPanel
     private var right: JPanel
@@ -34,11 +34,11 @@ class Editor(objectz: Any) {
 
         left = JPanel()
         left.layout = GridLayout()
-        rootPanel = JScrollPane(RootPanel()).apply {
+        scrollPanel = JScrollPane(rootPanel()).apply {
             horizontalScrollBarPolicy = JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS
             verticalScrollBarPolicy = JScrollPane.VERTICAL_SCROLLBAR_ALWAYS
         }
-        left.add(rootPanel)
+        left.add(scrollPanel)
         add(left)
 
         right = JPanel()
@@ -59,11 +59,11 @@ class Editor(objectz: Any) {
 
         left = JPanel()
         left.layout = GridLayout()
-        rootPanel = JScrollPane(RootPanel()).apply {
+        scrollPanel = JScrollPane(rootPanel()).apply {
             horizontalScrollBarPolicy = JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS
             verticalScrollBarPolicy = JScrollPane.VERTICAL_SCROLLBAR_ALWAYS
         }
-        left.add(rootPanel)
+        left.add(scrollPanel)
         frame.add(left)
 
         frame.remove(right)
@@ -80,7 +80,7 @@ class Editor(objectz: Any) {
         frame.repaint()
     }
 
-    private fun RootPanel(): JPanel =
+    private fun rootPanel(): JPanel =
         JPanel().apply {
             layout = BoxLayout(this, BoxLayout.Y_AXIS)
             alignmentX = Component.LEFT_ALIGNMENT
@@ -89,13 +89,16 @@ class Editor(objectz: Any) {
             jsonObject.properties.forEach {
                 when(it.value){
                     is JsonArray -> {
-                        add(arrayPrepWidget(it.key, it.value as JsonArray))
+                        add(arrayPanel(it.key, it.value as JsonArray))
+                        add(JLabel(" "))
                     }
                     is JsonObject -> {
-                        add(objectPrepWidget(mutableListOf(it.key),  it.value as JsonObject))
+                        add(objectPanel(mutableListOf(it.key),  it.value as JsonObject))
+                        add(JLabel(" "))
                     }
                     else ->{
                         add(propertyWidget(mutableListOf(it.key),  it.value.toJsonString().removeSurrounding("\"")))
+                        add(JLabel(" "))
                     }
                 }
             }
@@ -167,7 +170,7 @@ class Editor(objectz: Any) {
             })
         }
 
-    fun arrayWidget(value: String): JPanel =
+    private fun arrayElementWidget(key: String, value: String, iterador: Int): JPanel =
         JPanel().apply {
             layout = BoxLayout(this, BoxLayout.Y_AXIS)
             alignmentX = Component.LEFT_ALIGNMENT
@@ -176,23 +179,15 @@ class Editor(objectz: Any) {
             val text = JTextField(value)
             text.addFocusListener(object : FocusAdapter() {
                 override fun focusLost(e: FocusEvent) {
-                    //jsonObjectMap[key] = it
-                    //jsonObject = JsonObject(jsonObjectMap)
-                    //srcArea.text = jsonObject.toJsonString()
-                    //frame.repaint()
+                    if(value != text.text){
+                        val command = EditArrayElement(key, text.text, iterador)
+                        commandList.add(command)
+                        command.execute()
+                    }
                 }
             })
+
             add(text)
-        }
-
-    private fun arrayPrepWidget(key: String, array: JsonArray): JPanel =
-        JPanel().apply {
-            layout = BoxLayout(this, BoxLayout.Y_AXIS)
-            alignmentX = Component.LEFT_ALIGNMENT
-            alignmentY = Component.TOP_ALIGNMENT
-
-            add(JLabel(" $key"))
-            add(arrayPanel(key, array))
         }
 
     private fun arrayPanel(key: String, array: JsonArray): JPanel =
@@ -201,20 +196,22 @@ class Editor(objectz: Any) {
             alignmentX = Component.LEFT_ALIGNMENT
             alignmentY = Component.TOP_ALIGNMENT
 
-            var arrayF = array
+            add(JLabel("  $key"))
 
-            add(JLabel(" "))
-            var i = 0
+            var arrayF = array
+            var iterador = 0
+
             array.elements.forEach {
                 when(it){
                     is JsonObject -> {
-                        add(objectPrepWidget(mutableListOf(key, i.toString()), it))
+                        add(objectPanel(mutableListOf(key, iterador.toString()), it))
                     }
                     else ->{
-                        add(arrayWidget(it.toJsonString().removeSurrounding("\"")))
+                        add(JLabel(iterador.toString()))
+                        add(arrayElementWidget(key, it.toJsonString().removeSurrounding("\""), iterador))
                     }
                 }
-                i++
+                iterador++
             }
 
             // menu
@@ -222,39 +219,65 @@ class Editor(objectz: Any) {
                 override fun mouseClicked(e: MouseEvent) {
                     if (SwingUtilities.isRightMouseButton(e)) {
                         val menu = JPopupMenu("Message")
-                        val add = JButton("Add Array Element Element")
-                        add.addActionListener {
-                            val command = AddArrayElement(this@apply, arrayF)
+                        val addEle = JButton("Add Array Element Element")
+                        addEle.addActionListener {
+                            val command = AddArrayElement(this@apply, key, arrayF, iterador.toString())
                             commandList.add(command)
                             command.execute()
                             arrayF = command.newJsonArray
                             menu.isVisible = false
+                            iterador++
                         }
-                        val del = JButton("delete all")
-                        del.addActionListener {
-                            components.forEach {
-                                remove(it)
+
+                        val addDel = JButton("Delete Element")
+                        addDel.addActionListener {
+                            var done = true
+                            var eleDel = ""
+                            while(done){
+                                eleDel = JOptionPane.showInputDialog("Witch element would you like to delete? (Only Integers Alowed)")
+                                if(isStringInt(eleDel)){
+                                    if(eleDel.toInt() < arrayF.elements.size && eleDel.toInt() >= 0){
+                                        done = false
+                                    }
+                                }
                             }
                             menu.isVisible = false
-                            revalidate()
-                            frame.repaint()
+                            val command = DeleteArrayElement(key, eleDel.toInt())
+                            commandList.add(command)
+                            command.execute()
                         }
-                        menu.add(add)
-                        menu.add(del)
+
+                        val addObj = JButton("Add Object")
+                        addObj.addActionListener {
+                            val propList = mutableListOf<String>()
+                            var done = true
+
+                            while(done){
+                                val propName = JOptionPane.showInputDialog("Property Name (Enter \"?\" when finished)")
+                                if(!propName.equals("?")){
+                                    if(!propList.contains(propName)) {
+                                        propList.add(propName)
+                                    }
+                                }
+                                else{
+                                    done = false
+                                }
+                            }
+                            menu.isVisible = false
+                            val command = AddObjectToArray(this@apply, key, iterador.toString(), propList, arrayF)
+                            commandList.add(command)
+                            command.execute()
+                            arrayF = command.array
+                            iterador++
+                        }
+
+                        menu.add(addObj)
+                        menu.add(addEle)
+                        menu.add(addDel)
                         menu.show(this@apply, 200, 250)
                     }
                 }
             })
-        }
-
-    fun objectPrepWidget(listKeys: MutableList<String>, objectR: JsonObject): JPanel =
-        JPanel().apply {
-            layout = BoxLayout(this, BoxLayout.Y_AXIS)
-            alignmentX = Component.LEFT_ALIGNMENT
-            alignmentY = Component.TOP_ALIGNMENT
-
-            add(JLabel("   " + listKeys.last()))
-            add(objectPanel(listKeys, objectR))
         }
 
     private fun objectPanel(listKeys: MutableList<String>, objectR: JsonObject): JPanel =
@@ -263,13 +286,15 @@ class Editor(objectz: Any) {
             alignmentX = Component.LEFT_ALIGNMENT
             alignmentY = Component.TOP_ALIGNMENT
 
+            add(JLabel("  " + listKeys.last()))
+
             objectR.properties.forEach {
                 when(it.value){
                     is JsonArray -> {
-                        add(arrayPrepWidget(it.key, it.value as JsonArray))
+                        add(arrayPanel(it.key, it.value as JsonArray))
                     }
                     is JsonObject -> {
-                        add(objectPrepWidget(listKeys,  it.value as JsonObject))
+                        add(objectPanel(listKeys,  it.value as JsonObject))
                     }
                     else -> {
                         val listaKeys = listKeys.toMutableList()
@@ -320,7 +345,6 @@ class Editor(objectz: Any) {
                             val command = AddObject(this@apply, listaKeys, propList)
                             commandList.add(command)
                             command.execute()
-                            menu.isVisible = false
                         }
 
                         val undo = JButton("Undo")
@@ -331,33 +355,22 @@ class Editor(objectz: Any) {
                             }
                             menu.isVisible = false
                         }
-
-                        val del = JButton("Delete all")
-                        del.addActionListener {
-                            components.forEach {
-                                remove(it)
-                            }
-                            menu.isVisible = false
-                            revalidate()
-                            frame.repaint()
-                        }
                         menu.add(addPro)
                         menu.add(addObj)
                         menu.add(undo)
-                        menu.add(del)
                         menu.show(this@apply, 100, 100)
                     }
                 }
             })
         }
 
-    fun propertyWidget(listKeys: MutableList<String>, value: String): JPanel =
+    private fun propertyWidget(listKeys: MutableList<String>, value: String): JPanel =
         JPanel().apply {
             layout = BoxLayout(this, BoxLayout.X_AXIS)
             alignmentX = Component.LEFT_ALIGNMENT
             alignmentY = Component.TOP_ALIGNMENT
 
-            add(JLabel(" " + listKeys.last()))
+            add(JLabel("  ${listKeys.last()}"))
             val text = JTextField(value)
 
             // menu
@@ -419,6 +432,7 @@ class Editor(objectz: Any) {
             addValueToNestedMap(jsonObjectMap, keys, toJson(null))
             jsonObject = JsonObject(jsonObjectMap)
             srcArea.text = jsonObject.toJsonString()
+
             panel.revalidate()
             frame.repaint()
         }
@@ -447,7 +461,25 @@ class Editor(objectz: Any) {
         }
     }
 
-    inner class ResetObject() : Command {
+    inner class DeleteArrayElement(private var key: String, private var iterador: Int) : Command {
+        private val oldValue = jsonObjectMap.toMutableMap()
+
+        override fun execute() {
+            val array = jsonObjectMap[key] as JsonArray
+            val newArray = array.elements
+            newArray.removeAt(iterador)
+            jsonObjectMap[key] = JsonArray(newArray)
+            jsonObject = JsonObject(jsonObjectMap)
+            resetFrame()
+        }
+        override fun undo(){
+            jsonObjectMap = oldValue
+            jsonObject = JsonObject(jsonObjectMap)
+            resetFrame()
+        }
+    }
+
+    inner class ResetObject : Command {
         private var oldValue = jsonObjectMap.toMutableMap()
 
         override fun execute() {
@@ -473,7 +505,7 @@ class Editor(objectz: Any) {
                 newObjectMap[it] = JsonNull()
             }
             val objR = JsonObject(newObjectMap)
-            panel.add(objectPrepWidget(keys, objR))
+            panel.add(objectPanel(keys, objR))
             addValueToNestedMap(jsonObjectMap, keys, objR)
 
             jsonObject = JsonObject(jsonObjectMap)
@@ -500,6 +532,7 @@ class Editor(objectz: Any) {
             panel.revalidate()
             frame.repaint()
         }
+
         override fun undo(){
             jTextField.text = oldValue.toJsonString().removeSurrounding("\"")
             addValueToNestedMap(jsonObjectMap, keys, oldValue)
@@ -510,19 +543,52 @@ class Editor(objectz: Any) {
         }
     }
 
-    inner class AddArrayElement(private var panel: JPanel, private var array: JsonArray) : Command {
+    inner class AddObjectToArray(private var panel: JPanel, private var key: String, private var iterador: String, private var properties: MutableList<String>, var array: JsonArray) : Command {
+        private var oldValue = jsonObjectMap.toMutableMap()
+
+        override fun execute() {
+            val newObjectMap = mutableMapOf<String, JsonValue>()
+            properties.forEach {
+                newObjectMap[it] = JsonNull()
+            }
+            val objR = JsonObject(newObjectMap)
+
+            val newArray: MutableList<JsonValue> = array.elements.toMutableList()
+            newArray.add(objR)
+
+            panel.add(objectPanel(mutableListOf(key, iterador), objR))
+
+            array = JsonArray(newArray)
+
+            jsonObjectMap[key] = array
+            jsonObject = JsonObject(jsonObjectMap)
+            srcArea.text = jsonObject.toJsonString()
+            panel.revalidate()
+            frame.repaint()
+        }
+
+        override fun undo(){
+            jsonObjectMap = oldValue
+            jsonObject = JsonObject(jsonObjectMap)
+            resetFrame()
+        }
+    }
+
+    inner class AddArrayElement(private var panel: JPanel, private var key: String, private var array: JsonArray, private var iterador: String) : Command {
         private var oldValue = jsonObjectMap.toMutableMap()
         var newJsonArray = array
 
         override fun execute() {
-            val k = getKeyByValue(jsonObjectMap, array) as String
+            //val key = getKeyByValue(jsonObjectMap, array) as String
             val newArray: MutableList<JsonValue> = array.elements.toMutableList()
             newArray.add(JsonNull())
+            panel.add(JLabel("   $iterador"))
+
+            panel.add(arrayElementWidget(key, "null", iterador.toInt()))
             newJsonArray = JsonArray(newArray)
-            jsonObjectMap[k] = newJsonArray
+            jsonObjectMap[key] = newJsonArray
             jsonObject = JsonObject(jsonObjectMap)
             srcArea.text = jsonObject.toJsonString()
-            panel.add(arrayWidget("null"))
             panel.revalidate()
             frame.repaint()
         }
@@ -530,6 +596,25 @@ class Editor(objectz: Any) {
             jsonObjectMap = oldValue
             jsonObject = JsonObject(jsonObjectMap)
 
+            resetFrame()
+        }
+    }
+
+    inner class EditArrayElement(private var key: String, private var value: String, private var iterador: Int) : Command {
+        private var oldValue = jsonObjectMap.toMutableMap()
+
+        override fun execute() {
+            val array = jsonObjectMap[key] as JsonArray
+            val newArray = array.elements
+            newArray[iterador] = toJson(parseValue(value))
+            jsonObjectMap[key] = JsonArray(newArray)
+            jsonObject = JsonObject(jsonObjectMap)
+            resetFrame()
+        }
+
+        override fun undo(){
+            jsonObjectMap = oldValue
+            jsonObject = JsonObject(jsonObjectMap)
             resetFrame()
         }
     }

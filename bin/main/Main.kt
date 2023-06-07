@@ -6,7 +6,7 @@ interface JsonValue {
     fun accept(jsonVisitor: JsonVisitor)
 }
 
-class JsonObject(val properties: Map<String, JsonValue>) : JsonValue {
+class JsonObject(val properties: MutableMap<String, JsonValue>) : JsonValue {
     override fun toJsonString(): String {
         return buildString {
             append("{\n")
@@ -27,7 +27,7 @@ class JsonObject(val properties: Map<String, JsonValue>) : JsonValue {
     }
 }
 
-class JsonArray(val elements: List<JsonValue>) : JsonValue {
+class JsonArray(val elements: MutableList<JsonValue>) : JsonValue {
     override fun toJsonString(): String {
         return buildString {
             append("[\n")
