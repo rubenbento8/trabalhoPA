@@ -1,4 +1,3 @@
-import javax.swing.*
 import kotlin.reflect.*
 import kotlin.reflect.full.*
 
@@ -21,7 +20,7 @@ val KClass<*>.dataClassFields: List<KProperty<*>>
 val KClassifier?.isEnum: Boolean
     get() = this is KClass<*> && this.isSubclassOf(Enum::class)
 
-val getTypeMap = mapOf<KType, String>(
+val getTypeMap = mapOf(
     String::class.createType() to "String",
     Int::class.createType() to "Int",
     Double::class.createType() to "Double",
@@ -54,35 +53,11 @@ fun parseValue(input: String): Any? {
     }
 }
 
-sealed class MapOrJPanel(open val parent: MapOrJPanel.Map? = null) {
-    data class Panel(override val parent: MapOrJPanel.Map?, val jPanel: JPanel) : MapOrJPanel(parent)
-    data class Map(override val parent: MapOrJPanel.Map? = null, val map: MutableMap<String, MapOrJPanel> = mutableMapOf()) : MapOrJPanel(parent)
-
-    // Add a child to a map, setting the map as the child's parent
-    fun Map.addChild(key: String, child: MapOrJPanel) {
-        when (child) {
-            is MapOrJPanel.Panel -> map[key] = MapOrJPanel.Panel(this, child.jPanel)
-            is MapOrJPanel.Map -> map[key] = MapOrJPanel.Map(this, child.map)
-        }
-    }
-
-    fun handle(mapOrJPanel: MapOrJPanel) {
-        when(mapOrJPanel) {
-            is MapOrJPanel.Panel -> {
-                // Do something with mapOrJPanel.jPanel
-            }
-            is MapOrJPanel.Map -> {
-                // Do something with mapOrJPanel.map
-            }
-        }
-    }
-}
-
 typealias NestedMap = MutableMap<String, JsonValue>
 
 fun addValueToNestedMap(nestedMap: NestedMap, keys: List<String>, newValue: JsonValue) {
     var currentMap = nestedMap
-    var newValueKey = keys.last()
+    val newValueKey = keys.last()
     var currentArray = mutableListOf<JsonValue>()
 
     for (key in keys) {
@@ -109,7 +84,7 @@ fun addValueToNestedMap(nestedMap: NestedMap, keys: List<String>, newValue: Json
 
 fun removeValueToNestedMap(nestedMap: NestedMap, keys: List<String>) {
     var currentMap = nestedMap
-    var newValueKey = keys.last()
+    val newValueKey = keys.last()
     var currentArray = mutableListOf<JsonValue>()
 
     for (key in keys) {
@@ -187,9 +162,5 @@ fun getLastValue(nestedMap: NestedMap, keys: List<String>): JsonValue {
         }
     }
     return(currentMap.get(keys.last())!!)
-}
-
-fun <String, JsonValue> getKeyByValue(map: Map<String, JsonValue>, value: JsonValue): String? {
-    return map.entries.find { it.value == value }?.key
 }
 

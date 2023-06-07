@@ -614,7 +614,7 @@ class GetNumerosVisitor : JsonVisitor {
         }
     }
 
-    fun getNumeros(): List<Int> {
+    override fun getNumeros(): List<Int> {
         return numbers
     }
 
@@ -628,7 +628,7 @@ class GetObjectsWithNameAndNumberVisitor : JsonVisitor {
         }
     }
 
-    fun getObjectsWithNameAndNumberVisitor(): List<String> {
+    override fun getObjectsWithNameAndNumberVisitor(): List<String> {
         return objects
     }
 }
@@ -644,7 +644,7 @@ class VerifyStructureVisitor : JsonVisitor {
         }
     }
 
-    fun isValidStructure(): Boolean {
+    override fun isValidStructure(): Boolean {
         return isValid
     }
 }
@@ -669,7 +669,7 @@ class VerifyInscritosVisitor : JsonVisitor {
         }
     }
 
-    fun verifyInscritosVisitor(): Boolean {
+    override fun verifyInscritosVisitor(): Boolean {
         return hasError
     }
 }

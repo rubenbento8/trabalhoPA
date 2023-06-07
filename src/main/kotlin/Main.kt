@@ -56,7 +56,7 @@ class JsonInt(val value: Int) : JsonValue {
 
 }
 
-class JsonDouble(val value: Double) : JsonValue {
+class JsonDouble(private val value: Double) : JsonValue {
     override fun toJsonString(): String {
         return value.toString()
     }
@@ -66,7 +66,7 @@ class JsonDouble(val value: Double) : JsonValue {
     }
 }
 
-class JsonString(val value: String) : JsonValue {
+class JsonString(private val value: String) : JsonValue {
     override fun toJsonString(): String {
         return "\"$value\""
     }
@@ -76,7 +76,7 @@ class JsonString(val value: String) : JsonValue {
     }
 }
 
-class JsonBoolean(val value: Boolean) : JsonValue {
+class JsonBoolean(private val value: Boolean) : JsonValue {
     override fun toJsonString(): String {
         return value.toString()
     }
@@ -107,6 +107,21 @@ interface JsonVisitor {
     fun visit(jsonString: JsonString) {}
     fun visit(jsonBoolean: JsonBoolean) {}
     fun visit(jsonNull: JsonNull) {}
+    fun getNumeros(): List<Int> {
+        return emptyList()
+    }
+
+    fun getObjectsWithNameAndNumberVisitor(): List<String> {
+        return emptyList()
+    }
+
+    fun isValidStructure(): Boolean {
+        return true
+    }
+
+    fun verifyInscritosVisitor(): Boolean {
+        return true
+    }
 }
 
 @Target(AnnotationTarget.PROPERTY)
@@ -134,10 +149,6 @@ fun toJson(inputR: Any?): JsonValue {
                 return JsonString(inputR)
             }
 
-            is Char -> {
-                return JsonString(inputR as String)
-            }
-
             is Boolean -> {
                 return JsonBoolean(inputR)
             }
@@ -152,7 +163,7 @@ fun toJson(inputR: Any?): JsonValue {
 
             is Collection<*> -> {
                 val list = mutableListOf<JsonValue>()
-                inputR.forEach { it ->
+                inputR.forEach {
                     list.add(toJson(it!!))
                 }
                 return JsonArray(list)
