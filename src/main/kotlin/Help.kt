@@ -90,17 +90,17 @@ fun addValueToNestedMap(nestedMap: NestedMap, keys: List<String>, newValue: Json
             if (!key.equals(keys.last())) {
                 if (currentMap.get(key) is JsonObject) {
                     val value = currentMap.get(key) as JsonObject
-                    currentMap = value.properties
+                    currentMap = value.properties as NestedMap
                 }
                 else if(currentMap.get(key) is JsonArray){
                     val value = currentMap.get(key) as JsonArray
-                    currentArray = value.elements
+                    currentArray = value.elements.toMutableList()
                 }
             }
         }
         else{
             val value = currentArray.get(key.toInt()) as JsonObject
-            currentMap = value.properties
+            currentMap = value.properties as NestedMap
         }
     }
 
@@ -117,17 +117,17 @@ fun removeValueToNestedMap(nestedMap: NestedMap, keys: List<String>) {
             if (!key.equals(keys.last())) {
                 if (currentMap.get(key) is JsonObject) {
                     val value = currentMap.get(key) as JsonObject
-                    currentMap = value.properties
+                    currentMap = value.properties as NestedMap
                 }
                 else if(currentMap.get(key) is JsonArray){
                     val value = currentMap.get(key) as JsonArray
-                    currentArray = value.elements
+                    currentArray = value.elements.toMutableList()
                 }
             }
         }
         else{
             val value = currentArray.get(key.toInt()) as JsonObject
-            currentMap = value.properties
+            currentMap = value.properties as NestedMap
         }
     }
 
@@ -143,17 +143,17 @@ fun checkIfValueDoesntChange(nestedMap: NestedMap, keys: List<String>, newValue:
             if (!key.equals(keys.last())) {
                 if (currentMap.get(key) is JsonObject) {
                     val value = currentMap.get(key) as JsonObject
-                    currentMap = value.properties
+                    currentMap = value.properties as NestedMap
                 }
                 else if(currentMap.get(key) is JsonArray){
                     val value = currentMap.get(key) as JsonArray
-                    currentArray = value.elements
+                    currentArray = value.elements.toMutableList()
                 }
             }
         }
         else{
             val value = currentArray.get(key.toInt()) as JsonObject
-            currentMap = value.properties
+            currentMap = value.properties as NestedMap
         }
     }
 
@@ -173,17 +173,17 @@ fun getLastValue(nestedMap: NestedMap, keys: List<String>): JsonValue {
             if (!key.equals(keys.last())) {
                 if (currentMap.get(key) is JsonObject) {
                     val value = currentMap.get(key) as JsonObject
-                    currentMap = value.properties
+                    currentMap = value.properties as NestedMap
                 }
                 else if(currentMap.get(key) is JsonArray){
                     val value = currentMap.get(key) as JsonArray
-                    currentArray = value.elements
+                    currentArray = value.elements.toMutableList()
                 }
             }
         }
         else{
             val value = currentArray.get(key.toInt()) as JsonObject
-            currentMap = value.properties
+            currentMap = value.properties as NestedMap
         }
     }
     return(currentMap.get(keys.last())!!)

@@ -107,21 +107,6 @@ interface JsonVisitor {
     fun visit(jsonString: JsonString) {}
     fun visit(jsonBoolean: JsonBoolean) {}
     fun visit(jsonNull: JsonNull) {}
-    fun getNumeros(): List<Int> {
-        return emptyList()
-    }
-
-    fun getObjectsWithNameAndNumberVisitor(): List<String> {
-        return emptyList()
-    }
-
-    fun isValidStructure(): Boolean {
-        return true
-    }
-
-    fun verifyInscritosVisitor(): Boolean {
-        return true
-    }
 }
 
 @Target(AnnotationTarget.PROPERTY)

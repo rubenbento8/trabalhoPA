@@ -1,6 +1,6 @@
 Neste documento está explicado que anotações existem e como as usar na classe JsonValue para personalizar o comportamento de serialização e desserialização de objetos.
 
-* Anotação PropertyName:
+* Anotação @PropertyName:
 A anotação PropertyName é usada para especificar o nome de propriedades em objetos JSON. Ela é aplicada em propriedades de uma classe de dados e permite definir um nome personalizado para a propriedade no JSON.
 
     Exemplo de uso:
@@ -15,8 +15,8 @@ A anotação PropertyName é usada para especificar o nome de propriedades em ob
     )
     ````
 
-* Anotação Ignore:
-A anotação Ignore é usada para indicar que uma propriedade não deve ser incluída na serialização ou desserialização JSON. É útil quando você deseja excluir certas propriedades do objeto JSON.
+* Anotação @Ignore:
+A anotação Ignore é usada para indicar que uma propriedade não deve ser incluída na serialização ou desserialização JSON. É útil desejar excluir certas propriedades do objeto JSON.
 
     Exemplo de uso:
     ````kotlin
@@ -28,7 +28,7 @@ A anotação Ignore é usada para indicar que uma propriedade não deve ser incl
     )
     ````
 
-* Anotação UseAsString:
+* Anotação @UseAsString:
 A anotação UseAsString é usada para forçar a serialização de uma propriedade como uma string no JSON, independentemente do tipo de dado real da propriedade.
 
     Exemplo de uso:
