@@ -20,7 +20,7 @@ class Editor(objectz: Any) {
 
     private var commandList: Stack<Command> = Stack<Command>()
     private var jsonObject: JsonObject = toJson(objectz) as JsonObject
-    private var jsonObjectMap: MutableMap<String, JsonValue> = jsonObject.properties
+    private var jsonObjectMap: MutableMap<String, JsonValue> = jsonObject.properties as MutableMap<String, JsonValue>
     private var rootPanel: JScrollPane
     private var srcArea: JTextArea
     private var left: JPanel
